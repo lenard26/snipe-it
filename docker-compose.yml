@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   snipeit:
@@ -7,44 +7,44 @@ services:
       dockerfile: Dockerfile.alpine
     container_name: snipeit
     ports:
-    - "8000:80"
+      - "8000:80"
     volumes:
-    - ./logs:/var/www/html/storage/logs
+      - logs:/var/www/html/storage/logs
     depends_on:
-    - mariadb
-    - redis
+      - snipedb
+      - redis
     env_file:
-    - .env.docker
+      - .env.docker
     networks:
-    - snipeit-backend
+      - snipeit-backend
 
-  mariadb:
+  snipedb:
     image: mariadb:10.6.4-focal
     volumes:
-    - db:/var/lib/mysql
+      - db:/var/lib/mysql
     env_file:
-    - .env.docker
+      - .env.docker
     networks:
-    - snipeit-backend
+      - snipeit-backend
     ports:
       - "3306:3306"
 
   redis:
     image: redis:6.2.5-buster
     networks:
-    - snipeit-backend
+      - snipeit-backend
 
   mailhog:
     image: mailhog/mailhog:v1.0.1
     ports:
-    # - 1025:1025
-    - "8025:8025"
+      # - 1025:1025
+      - "8025:8025"
     networks:
-    - snipeit-backend
-
+      - snipeit-backend
 
 volumes:
   db: {}
+  logs: {}
 
 networks:
   snipeit-backend: {}

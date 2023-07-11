@@ -51,7 +51,7 @@ class SettingsController extends Controller
         $start_settings['php_version_min'] = false;
 
         if (version_compare(PHP_VERSION, config('app.min_php'), '<')) {
-            return response('<center><h1>This software requires PHP version '.config('app.min_php').' or greater. This server is running '.PHP_VERSION.'. </h1><h2>Please upgrade PHP on this server and try again. </h2></center>', 500);
+            return response('<center><h1>This software requires PHP version ' . config('app.min_php') . ' or greater. This server is running ' . PHP_VERSION . '. </h1><h2>Please upgrade PHP on this server and try again. </h2></center>', 500);
         }
 
         try {
@@ -79,18 +79,18 @@ class SettingsController extends Controller
             $host = array_key_exists('SERVER_NAME', $_SERVER) ? $_SERVER['SERVER_NAME'] : null;
             $port = array_key_exists('SERVER_PORT', $_SERVER) ? $_SERVER['SERVER_PORT'] : null;
             if (('http://' === $protocol && '80' != $port) || ('https://' === $protocol && '443' != $port)) {
-                $host .= ':'.$port;
+                $host .= ':' . $port;
             }
         }
-        $pageURL = $protocol.$host.$_SERVER['REQUEST_URI'];
+        $pageURL = $protocol . $host . $_SERVER['REQUEST_URI'];
 
-        $start_settings['url_config'] = config('app.url').'/setup';
+        $start_settings['url_config'] = config('app.url') . '/setup';
         $start_settings['url_valid'] = ($start_settings['url_config'] === $pageURL);
         $start_settings['real_url'] = $pageURL;
         $start_settings['php_version_min'] = true;
 
         // Curl the .env file to make sure it's not accessible via a browser
-        $ch = curl_init($protocol.$host.'/.env');
+        $ch = curl_init($protocol . $host . '/.env');
         curl_setopt($ch, CURLOPT_HEADER, true);    // we want headers
         curl_setopt($ch, CURLOPT_NOBODY, true);    // we don't need body
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -137,11 +137,11 @@ class SettingsController extends Controller
         }
 
         if ((is_writable(storage_path()))
-            && (is_writable(storage_path().'/framework'))
-            && (is_writable(storage_path().'/framework/cache'))
-            && (is_writable(storage_path().'/framework/sessions'))
-            && (is_writable(storage_path().'/framework/views'))
-            && (is_writable(storage_path().'/logs'))
+            && (is_writable(storage_path() . '/framework'))
+            && (is_writable(storage_path() . '/framework/cache'))
+            && (is_writable(storage_path() . '/framework/sessions'))
+            && (is_writable(storage_path() . '/framework/views'))
+            && (is_writable(storage_path() . '/logs'))
         ) {
             $start_settings['writable'] = true;
         } else {
@@ -194,7 +194,7 @@ class SettingsController extends Controller
         $settings->auto_increment_assets = $request->input('auto_increment_assets', 0);
         $settings->auto_increment_prefix = $request->input('auto_increment_prefix');
 
-        if ((! $user->isValid()) || (! $settings->isValid())) {
+        if ((!$user->isValid()) || (!$settings->isValid())) {
             return redirect()->back()->withInput()->withErrors($user->getErrors())->withErrors($settings->getErrors());
         } else {
             $user->save();
@@ -260,7 +260,7 @@ class SettingsController extends Controller
     public function getSetupMigrate()
     {
         Artisan::call('migrate', ['--force' => true]);
-        if ((! file_exists(storage_path().'/oauth-private.key')) || (! file_exists(storage_path().'/oauth-public.key'))) {
+        if ((!file_exists(storage_path() . '/oauth-private.key')) || (!file_exists(storage_path() . '/oauth-public.key'))) {
             Artisan::call('migrate', ['--path' => 'vendor/laravel/passport/database/migrations', '--force' => true]);
             Artisan::call('passport:install');
         }
@@ -350,7 +350,7 @@ class SettingsController extends Controller
         $setting->username_format = $request->input('username_format');
         $setting->require_accept_signature = $request->input('require_accept_signature');
         $setting->show_assigned_assets = $request->input('show_assigned_assets', '0');
-        if (! config('app.lock_passwords')) {
+        if (!config('app.lock_passwords')) {
             $setting->login_note = $request->input('login_note');
         }
 
@@ -419,7 +419,7 @@ class SettingsController extends Controller
 
         // Only allow the site name and CSS to be changed if lock_passwords is false
         // Because public demos make people act like dicks
-        if (! config('app.lock_passwords')) {
+        if (!config('app.lock_passwords')) {
             $setting->site_name = $request->input('site_name');
             $setting->custom_css = $request->input('custom_css');
         }
@@ -427,16 +427,16 @@ class SettingsController extends Controller
         $setting = $request->handleImages($setting, 600, 'logo', '', 'logo');
 
         if ('1' == $request->input('clear_logo')) {
-                Storage::disk('public')->delete($setting->logo);
+            Storage::disk('public')->delete($setting->logo);
             $setting->logo = null;
-                $setting->brand = 1;
+            $setting->brand = 1;
         }
 
 
         $setting = $request->handleImages($setting, 600, 'email_logo', '', 'email_logo');
 
 
-       if ('1' == $request->input('clear_email_logo')) {
+        if ('1' == $request->input('clear_email_logo')) {
             Storage::disk('public')->delete($setting->email_logo);
             $setting->email_logo = null;
             // If they are uploading an image, validate it and upload it
@@ -453,10 +453,10 @@ class SettingsController extends Controller
 
 
         // If the user wants to clear the favicon...
-         if ($request->hasFile('favicon')) {
+        if ($request->hasFile('favicon')) {
             $favicon_image = $favicon_upload = $request->file('favicon');
             $favicon_ext = $favicon_image->getClientOriginalExtension();
-            $setting->favicon = $favicon_file_name = 'favicon-uploaded.'.$favicon_ext;
+            $setting->favicon = $favicon_file_name = 'favicon-uploaded.' . $favicon_ext;
 
             if (($favicon_image->getClientOriginalExtension() != 'ico') && ($favicon_image->getClientOriginalExtension() != 'svg')) {
                 $favicon_upload = Image::make($favicon_image->getRealPath())->resize(null, 36, function ($constraint) {
@@ -476,11 +476,11 @@ class SettingsController extends Controller
                 Storage::disk('public')->delete($favicon_file_name);
             }
         } elseif ('1' == $request->input('clear_favicon')) {
-             Storage::disk('public')->delete($setting->clear_favicon);
+            Storage::disk('public')->delete($setting->clear_favicon);
             $setting->favicon = null;
 
-             // If they are uploading an image, validate it and upload it
-         }
+            // If they are uploading an image, validate it and upload it
+        }
 
         if ($setting->save()) {
             return redirect()->route('settings.index')
@@ -521,7 +521,7 @@ class SettingsController extends Controller
         if (is_null($setting = Setting::getSettings())) {
             return redirect()->to('admin')->with('error', trans('admin/settings/message.update.error'));
         }
-        if (! config('app.lock_passwords')) {
+        if (!config('app.lock_passwords')) {
             if ('' == $request->input('two_factor_enabled')) {
                 $setting->two_factor_enabled = null;
             } else {
@@ -583,7 +583,7 @@ class SettingsController extends Controller
             return redirect()->to('admin')->with('error', trans('admin/settings/message.update.error'));
         }
 
-        if (! config('app.lock_passwords')) {
+        if (!config('app.lock_passwords')) {
             $setting->locale = $request->input('locale', 'en');
         }
         $setting->default_currency = $request->input('default_currency', '$');
@@ -635,7 +635,7 @@ class SettingsController extends Controller
 
             // Be careful - this could be a negative number
             $audit_diff_months = ((int)$request->input('audit_interval') - (int)($setting->audit_interval));
-            
+
             // Grab all of the assets that have an existing next_audit_date
             $assets = Asset::whereNotNull('next_audit_date')->get();
 
@@ -644,7 +644,7 @@ class SettingsController extends Controller
 
                 if ($asset->next_audit_date != '') {
                     $old_next_audit = new \DateTime($asset->next_audit_date);
-                    $asset->next_audit_date = $old_next_audit->modify($audit_diff_months.' month')->format('Y-m-d');
+                    $asset->next_audit_date = $old_next_audit->modify($audit_diff_months . ' month')->format('Y-m-d');
                     $asset->forceSave();
                 }
             }
@@ -932,7 +932,7 @@ class SettingsController extends Controller
             return redirect()->to('admin')->with('error', trans('admin/settings/message.update.error'));
         }
 
-        if (! config('app.lock_passwords') === true) {
+        if (!config('app.lock_passwords') === true) {
             $setting->ldap_enabled = $request->input('ldap_enabled', '0');
             $setting->ldap_server = $request->input('ldap_server');
             $setting->ldap_server_cert_ignore = $request->input('ldap_server_cert_ignore', false);
@@ -965,8 +965,6 @@ class SettingsController extends Controller
             $setting->ldap_dept = $request->input('ldap_dept');
             $setting->ldap_client_tls_cert   = $request->input('ldap_client_tls_cert');
             $setting->ldap_client_tls_key    = $request->input('ldap_client_tls_key');
-
-
         }
 
         if ($setting->save()) {
@@ -1014,11 +1012,11 @@ class SettingsController extends Controller
         $setting->saml_attr_mapping_username = $request->input('saml_attr_mapping_username');
         $setting->saml_forcelogin = $request->input('saml_forcelogin', '0');
         $setting->saml_slo = $request->input('saml_slo', '0');
-        if (! empty($request->input('saml_sp_privatekey'))) {
+        if (!empty($request->input('saml_sp_privatekey'))) {
             $setting->saml_sp_x509cert = $request->input('saml_sp_x509cert');
             $setting->saml_sp_privatekey = $request->input('saml_sp_privatekey');
         }
-        if (! empty($request->input('saml_sp_x509certNew'))) {
+        if (!empty($request->input('saml_sp_x509certNew'))) {
             $setting->saml_sp_x509certNew = $request->input('saml_sp_x509certNew');
         } else {
             $setting->saml_sp_x509certNew = '';
@@ -1034,7 +1032,7 @@ class SettingsController extends Controller
     }
     public static function getPDFBranding()
     {
-        $pdf_branding= Setting::getSettings();
+        $pdf_branding = Setting::getSettings();
 
         return $pdf_branding;
     }
@@ -1109,12 +1107,10 @@ class SettingsController extends Controller
                         'filename' => basename($backup_files[$f]),
                         'filesize' => Setting::fileSizeConvert(Storage::size($backup_files[$f])),
                         'modified_value' => $file_timestamp,
-                        'modified_display' => date($settings->date_display_format.' '.$settings->time_display_format, $file_timestamp),
-                        
+                        'modified_display' => date($settings->date_display_format . ' ' . $settings->time_display_format, $file_timestamp),
+
                     ];
                 }
-
-               
             }
         }
 
@@ -1135,12 +1131,12 @@ class SettingsController extends Controller
      */
     public function postBackups()
     {
-        if (! config('app.lock_passwords')) {
-            Artisan::call('snipeit:backup', ['--filename' => 'manual-backup-'.date('Y-m-d-H-i-s')]);
+        if (!config('app.lock_passwords')) {
+            Artisan::call('snipeit:backup', ['--filename' => 'manual-backup-' . date('Y-m-d-H-i-s')]);
             $output = Artisan::output();
 
             // Backup completed
-            if (! preg_match('/failed/', $output)) {
+            if (!preg_match('/failed/', $output)) {
                 return redirect()->route('settings.backups.index')
                     ->with('success', trans('admin/settings/message.backup.generated'));
             }
@@ -1171,9 +1167,9 @@ class SettingsController extends Controller
     {
         $path = 'app/backups';
 
-        if (! config('app.lock_passwords')) {
-            if (Storage::exists($path.'/'.$filename)) {
-                return StorageHelper::downloader($path.'/'.$filename);
+        if (!config('app.lock_passwords')) {
+            if (Storage::exists($path . '/' . $filename)) {
+                return StorageHelper::downloader($path . '/' . $filename);
             } else {
                 // Redirect to the backup page
                 return redirect()->route('settings.backups.index')->with('error', trans('admin/settings/message.backup.file_not_found'));
@@ -1195,7 +1191,7 @@ class SettingsController extends Controller
      */
     public function deleteFile($filename = null)
     {
-        if (config('app.allow_backup_delete')=='true') {
+        if (config('app.allow_backup_delete') == 'true') {
 
             if (!config('app.lock_passwords')) {
                 $path = 'app/backups';
@@ -1208,7 +1204,6 @@ class SettingsController extends Controller
                     } catch (\Exception $e) {
                         \Log::debug($e);
                     }
-
                 } else {
                     return redirect()->route('settings.backups.index')->with('error', trans('admin/settings/message.backup.file_not_found'));
                 }
@@ -1218,7 +1213,7 @@ class SettingsController extends Controller
         }
 
         // Hell to the no
-        \Log::warning('User ID '.Auth::user()->id.' is attempting to delete backup file '.$filename.' and is not authorized to.');
+        \Log::warning('User ID ' . Auth::user()->id . ' is attempting to delete backup file ' . $filename . ' and is not authorized to.');
         return redirect()->route('settings.backups.index')->with('error', trans('general.backup_delete_not_allowed'));
     }
 
@@ -1233,39 +1228,35 @@ class SettingsController extends Controller
      * @return Redirect
      */
 
-    public function postUploadBackup(Request $request) {
+    public function postUploadBackup(Request $request)
+    {
 
-        if (! config('app.lock_passwords')) {
+        if (!config('app.lock_passwords')) {
             if (!$request->hasFile('file')) {
                 return redirect()->route('settings.backups.index')->with('error', 'No file uploaded');
             } else {
                 $max_file_size = Helper::file_upload_max_size();
 
                 $rules = [
-                    'file' => 'required|mimes:zip|max:'.$max_file_size,
+                    'file' => 'required|mimes:zip|max:' . $max_file_size,
                 ];
 
                 $validator = \Validator::make($request->all(), $rules);
 
                 if ($validator->passes()) {
 
-                        $upload_filename = 'uploaded-'.date('U').'-'.Str::slug(pathinfo($request->file('file')->getClientOriginalName(), PATHINFO_FILENAME)).'.zip';
+                    $upload_filename = 'uploaded-' . date('U') . '-' . Str::slug(pathinfo($request->file('file')->getClientOriginalName(), PATHINFO_FILENAME)) . '.zip';
 
-                        Storage::putFileAs('app/backups', $request->file('file'), $upload_filename);
-            
-                        return redirect()->route('settings.backups.index')->with('success', 'File uploaded');
+                    Storage::putFileAs('app/backups', $request->file('file'), $upload_filename);
+
+                    return redirect()->route('settings.backups.index')->with('success', 'File uploaded');
                 }
 
                 return redirect()->route('settings.backups.index')->withErrors($request->getErrors());
-
             }
-
         } else {
             return redirect()->route('settings.backups.index')->with('error', trans('general.feature_disabled'));
-        }    
-
-        
-        
+        }
     }
 
     /**
@@ -1279,11 +1270,11 @@ class SettingsController extends Controller
      */
     public function postRestore($filename = null)
     {
-        
-        if (! config('app.lock_passwords')) {
+
+        if (!config('app.lock_passwords')) {
             $path = 'app/backups';
 
-            if (Storage::exists($path.'/'.$filename)) {
+            if (Storage::exists($path . '/' . $filename)) {
 
                 // grab the user's info so we can make sure they exist in the system
                 $user = User::find(Auth::user()->id);
@@ -1295,15 +1286,17 @@ class SettingsController extends Controller
                     '--force' => true,
                 ]);
 
-                \Log::debug('Attempting to restore from: '. storage_path($path).'/'.$filename);
+                \Log::debug('Attempting to restore from: ' . storage_path($path) . '/' . $filename);
 
                 // run the restore command
-                Artisan::call('snipeit:restore', 
-                [
-                    '--force' => true, 
-                    '--no-progress' => true, 
-                    'filename' => storage_path($path).'/'.$filename
-                ]);
+                Artisan::call(
+                    'snipeit:restore',
+                    [
+                        '--force' => true,
+                        '--no-progress' => true,
+                        'filename' => storage_path($path) . '/' . $filename
+                    ]
+                );
 
                 // If it's greater than 300, it probably worked
                 $output = Artisan::output();
@@ -1315,13 +1308,13 @@ class SettingsController extends Controller
                 \Log::debug($migrate_output);
 
                 $find_user = DB::table('users')->where('username', $user->username)->exists();
-                
-                if (!$find_user){
+
+                if (!$find_user) {
                     \Log::warning('Attempting to restore user: ' . $user->username);
                     $new_user = $user->replicate();
                     $new_user->push();
                 } else {
-                    \Log::debug('User: ' . $user->username .' already exists.');
+                    \Log::debug('User: ' . $user->username . ' already exists.');
                 }
 
                 \Log::debug('Logging all users out..');
@@ -1331,7 +1324,6 @@ class SettingsController extends Controller
                 \Auth::logout();
 
                 return redirect()->route('login')->with('success', 'Your system has been restored. Please login again.');
-                
             } else {
                 return redirect()->route('settings.backups.index')->with('error', trans('admin/settings/message.backup.file_not_found'));
             }
@@ -1352,14 +1344,13 @@ class SettingsController extends Controller
     public function getPurge()
     {
 
-        \Log::warning('User '.Auth::user()->username.' (ID'.Auth::user()->id.') is attempting a PURGE');
+        \Log::warning('User ' . Auth::user()->username . ' (ID' . Auth::user()->id . ') is attempting a PURGE');
 
-        if (config('app.allow_purge')=='true') {
+        if (config('app.allow_purge') == 'true') {
             return view('settings.purge-form');
         }
 
         return redirect()->route('settings.index')->with('error', trans('general.purge_not_allowed'));
-
     }
 
     /**
@@ -1373,14 +1364,14 @@ class SettingsController extends Controller
      */
     public function postPurge(Request $request)
     {
-        \Log::warning('User '.Auth::user()->username.' (ID'.Auth::user()->id.') is attempting a PURGE');
+        \Log::warning('User ' . Auth::user()->username . ' (ID' . Auth::user()->id . ') is attempting a PURGE');
 
-        if (config('app.allow_purge')=='true') {
+        if (config('app.allow_purge') == 'true') {
             \Log::debug('Purging is not allowed via the .env');
 
             if (!config('app.lock_passwords')) {
 
-                if ($request->input('confirm_purge')=='DELETE') {
+                if ($request->input('confirm_purge') == 'DELETE') {
 
                     \Log::warning('User ID ' . Auth::user()->id . ' initiated a PURGE!');
                     // Run a backup immediately before processing
@@ -1390,7 +1381,6 @@ class SettingsController extends Controller
 
                     return redirect()->route('settings.index')
                         ->with('output', $output)->with('success', trans('admin/settings/message.purge.success'));
-
                 } else {
                     return redirect()->route('settings.purge.index')
                         ->with('error', trans('admin/settings/message.purge.validation_failed'));
@@ -1401,7 +1391,7 @@ class SettingsController extends Controller
             }
         }
 
-        \Log::error('User '.Auth::user()->username.' (ID'.Auth::user()->id.') is attempting to purge deleted data and is not authorized to.');
+        \Log::error('User ' . Auth::user()->username . ' (ID' . Auth::user()->id . ') is attempting to purge deleted data and is not authorized to.');
 
 
         // Nope.
